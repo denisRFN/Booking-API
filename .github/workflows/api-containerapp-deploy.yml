@@ -1,0 +1,65 @@
+name: Deploy Booking API to Azure Container Apps
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "app/**"
+      - "requirements.txt"
+      - "Dockerfile"
+      - ".github/workflows/api-containerapp-deploy.yml"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: booking-api
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run basic import test
+        run: |
+          python -c "import fastapi, sqlalchemy"
+
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Log in to container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.AZURE_CONTAINER_REGISTRY_SERVER }}
+          username: ${{ secrets.AZURE_CONTAINER_REGISTRY_USERNAME }}
+          password: ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
+
+      - name: Build and push Docker image
+        env:
+          REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY_SERVER }}
+        run: |
+          IMAGE_TAG=${GITHUB_SHA}
+          docker build -t $REGISTRY/$IMAGE_NAME:$IMAGE_TAG .
+          docker push $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+          echo "IMAGE_FULL=$REGISTRY/$IMAGE_NAME:$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: Deploy to Azure Container Apps
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          resourceGroup: ${{ secrets.AZURE_CONTAINERAPPS_RESOURCE_GROUP }}
+          containerAppName: ${{ secrets.AZURE_CONTAINERAPPS_NAME }}
+          imageToDeploy: ${{ env.IMAGE_FULL }}
+
