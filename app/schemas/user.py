@@ -1,22 +1,38 @@
-from pydantic import BaseModel, EmailStr, constr
+from datetime import datetime
+from typing import Literal
+
+from pydantic import BaseModel, EmailStr
 
 
-class UserCreate(BaseModel):
-    username: constr(min_length=3, max_length=50)
+class UserBase(BaseModel):
+    name: str
     email: EmailStr
-    password: constr(min_length=6, max_length=72)
 
 
-class UserLogin(BaseModel):
-    username: str
+class UserCreate(UserBase):
     password: str
 
 
-class UserResponse(BaseModel):
+class UserRead(UserBase):
     id: int
-    username: str
-    email: str
-    role: str
+    role: Literal["user", "admin"]
+    created_at: datetime
 
     class Config:
         from_attributes = True
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+class TokenData(BaseModel):
+    sub: str | None = None
+    role: str | None = None
+

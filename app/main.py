@@ -1,22 +1,36 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from app.db.database import Base, engine
-
-# IMPORTANT – importăm toate modelele
-from app.models import user
-from app.models import desk
-
-from app.api import reservations
-from app.api import desks
-from app.api import auth
-from app.api import users
+from app.core.config import settings
+from app.database.session import Base, engine
+from app.routers import auth, users, desks, reservations, availability
 
 
-app = FastAPI()
+def create_app() -> FastAPI:
+    Base.metadata.create_all(bind=engine)
 
-Base.metadata.create_all(bind=engine)
+    app = FastAPI(title="Booking API", version="1.0.0")
 
-app.include_router(desks.router)
-app.include_router(reservations.router)
-app.include_router(auth.router)
-app.include_router(users.router)
+    origins: list[str] = []
+    if settings.BACKEND_CORS_ORIGINS:
+        origins = [o.strip() for o in settings.BACKEND_CORS_ORIGINS.split(",") if o.strip()]
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins or ["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    app.include_router(auth.router)
+    app.include_router(users.router)
+    app.include_router(desks.router)
+    app.include_router(reservations.router)
+    app.include_router(availability.router)
+
+    return app
+
+
+app = create_app()
+

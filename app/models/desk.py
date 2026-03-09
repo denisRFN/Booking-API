@@ -1,21 +1,20 @@
-import uuid
-from sqlalchemy import Column, String, Integer
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.ext.declarative import declarative_base
-from app.db.database import Base
+from datetime import datetime
 
+from sqlalchemy import String, Integer, DateTime
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.database.session import Base
 
 
 class Desk(Base):
-
     __tablename__ = "desks"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    position_x: Mapped[int] = mapped_column(Integer, nullable=False)
+    position_y: Mapped[int] = mapped_column(Integer, nullable=False)
+    room: Mapped[str] = mapped_column(String(100), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
 
-    name = Column(String, nullable=False)
+    reservations = relationship("Reservation", back_populates="desk", cascade="all, delete-orphan")
 
-    pos_x = Column(Integer)
-    pos_y = Column(Integer)
-
-    width = Column(Integer)
-    height = Column(Integer)
