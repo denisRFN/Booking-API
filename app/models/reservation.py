@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, Date, Time, ForeignKey
+from sqlalchemy import Column, Date, Time, ForeignKey, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from app.models.desk import Base
@@ -13,8 +13,8 @@ class Reservation(Base):
 
     desk_id = Column(UUID(as_uuid=True), ForeignKey("desks.id"))
 
-    user_id = Column(UUID(as_uuid=True))
-
+    user_id = Column(Integer, ForeignKey("users.id"))
+    user = relationship("User")
     date = Column(Date)
 
     start_time = Column(Time)

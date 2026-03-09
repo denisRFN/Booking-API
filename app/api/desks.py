@@ -5,8 +5,8 @@ from app.db.session import get_db
 from app.models.desk import Desk
 from app.schemas.desk_schema import DeskCreate
 
-router = APIRouter()
 
+router = APIRouter(prefix="/desks", tags=["desks"])
 
 @router.post("/desks")
 def create_desk(data: DeskCreate, db: Session = Depends(get_db)):

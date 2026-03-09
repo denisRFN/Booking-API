@@ -6,9 +6,6 @@ from uuid import UUID
 class ReservationCreate(BaseModel):
 
     desk_id: UUID
-    user_id: UUID
-
     date: date
-
     start_time: time
     end_time: time

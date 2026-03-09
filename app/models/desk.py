@@ -2,8 +2,8 @@ import uuid
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
+from app.db.database import Base
 
-Base = declarative_base()
 
 
 class Desk(Base):

@@ -1,14 +1,19 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from app.core.dependencies import get_current_user
 from app.db.session import get_db
 from app.models.reservation import Reservation
 from app.schemas.reservation_schema import ReservationCreate
 
-router = APIRouter()
+router = APIRouter(prefix="/reservations", tags=["reservations"])
 
 
 @router.post("/reservations")
-def create_reservation(data: ReservationCreate, db: Session = Depends(get_db)):
+def create_reservation(
+    data: ReservationCreate,
+    user=Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
 
     conflict = db.query(Reservation).filter(
         Reservation.desk_id == data.desk_id,
@@ -24,7 +29,13 @@ def create_reservation(data: ReservationCreate, db: Session = Depends(get_db)):
             detail="Desk already reserved for this time"
         )
 
-    reservation = Reservation(**data.dict())
+    reservation = Reservation(
+    desk_id=data.desk_id,
+    user_id=user["user_id"],
+    date=data.date,
+    start_time=data.start_time,
+    end_time=data.end_time
+)
 
     db.add(reservation)
 
