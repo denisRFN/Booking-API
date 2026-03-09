@@ -14,7 +14,7 @@ Backend API for the desk booking application. Provides authentication, desk mana
 
 Configuration is driven via environment variables:
 
-- `DATABASE_URL` – PostgreSQL connection string (Azure). Example:
+- `DATABASE_URL` – PostgreSQL connection string (Azure). Example :
   `postgresql+psycopg2://user:password@host:5432/dbname`
 - `SECRET_KEY` – strong secret key used for JWT signing
 - `ACCESS_TOKEN_EXPIRE_MINUTES` – JWT expiration in minutes (default: 60)
