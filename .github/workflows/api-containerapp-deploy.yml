@@ -40,6 +40,7 @@ jobs:
           client-id: ${{ secrets.BOOKINGAPI_AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.BOOKINGAPI_AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.BOOKINGAPI_AZURE_SUBSCRIPTION_ID }}
+          auth-type: SERVICE_PRINCIPAL
 
       - name: Log in to container registry
         uses: docker/login-action@v3
