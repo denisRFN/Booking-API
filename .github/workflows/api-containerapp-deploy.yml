@@ -1,5 +1,4 @@
 name: Deploy Booking API to Azure Container Apps
-
 on:
   push:
     branches:
