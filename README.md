@@ -1,5 +1,4 @@
 ## Booking API (FastAPI)
-
 Backend API for the desk booking application. Provides authentication, desk management, reservations, availability, and admin features.
 
 ### Tech Stack
