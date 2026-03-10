@@ -11,7 +11,6 @@ Backend API for the desk booking application. Provides authentication, desk mana
 - Docker support
 
 ### Configuration
-
 Configuration is driven via environment variables:
 
 - `DATABASE_URL` – PostgreSQL connection string (Azure). Example :
