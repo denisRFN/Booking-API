@@ -16,9 +16,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 def get_password_hash(password: str) -> str:
-    if len(password) > 72:
-        password = password[:72]
-    return pwd_context.hash(password)
+    return pwd_context.hash(password[:72])
 
 
 def create_access_token(subject: str, role: str, expires_delta: timedelta | None = None) -> str:
