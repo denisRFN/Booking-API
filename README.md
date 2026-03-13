@@ -3,7 +3,6 @@
 Backend API for the desk booking application. Provides authentication, desk management, reservations, availability, and admin features.
 
 ### Tech Stack
-
 - FastAPI
 - SQLAlchemy
 - PostgreSQL (Azure Database for PostgreSQL) 
