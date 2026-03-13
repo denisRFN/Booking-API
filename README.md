@@ -8,7 +8,7 @@ Backend API for the desk booking application. Provides authentication, desk mana
 - SQLAlchemy
 - PostgreSQL (Azure Database for PostgreSQL) 
 - JWT authentication
-- Docker support
+- Docker support 
 
 ### Configuration
 Configuration is driven via environment variables:
