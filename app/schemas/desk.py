@@ -19,11 +19,13 @@ class DeskUpdate(BaseModel):
     position_x: int | None = None
     position_y: int | None = None
     room: str | None = None
+    rotation_deg: int | None = None
 
 
 class DeskRead(DeskBase):
     id: int
     created_at: datetime
+    rotation_deg: int = 0
 
     class Config:
         from_attributes = True

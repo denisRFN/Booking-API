@@ -33,5 +33,6 @@ class AvailabilityDesk(BaseModel):
     position_x: int
     position_y: int
     room: str
+    rotation_deg: int = 0
     status: str  # available | occupied | mine
 

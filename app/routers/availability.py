@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.core.deps import get_current_user
 from app.database.session import get_db
 from app.models.desk import Desk
+from app.models.desk_layout import DeskLayout
 from app.models.reservation import Reservation
 from app.models.user import User
 from app.schemas.reservation import AvailabilityDesk
@@ -25,6 +26,8 @@ def get_availability(
     end_dt = datetime.combine(date_, time.max)
 
     desks = db.query(Desk).all()
+    layouts = db.query(DeskLayout).all()
+    by_desk_id = {l.desk_id: l.rotation_deg for l in layouts}
     reservations = (
         db.query(Reservation)
         .filter(
@@ -54,6 +57,7 @@ def get_availability(
                 position_x=d.position_x,
                 position_y=d.position_y,
                 room=d.room,
+                rotation_deg=by_desk_id.get(d.id, 0),
                 status=status,
             )
         )

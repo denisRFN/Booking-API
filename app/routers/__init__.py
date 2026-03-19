@@ -1,2 +1,2 @@
-from . import auth, users, desks, reservations, availability  # noqa: F401
+from . import auth, users, desks, reservations, availability, office_map_settings  # noqa: F401
 

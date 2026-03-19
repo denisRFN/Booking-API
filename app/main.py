@@ -3,7 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.database.session import Base, engine
-from app.routers import auth, users, desks, reservations, availability
+from app.routers import auth, users, desks, reservations, availability, office_map_settings
+from app.models.desk_layout import DeskLayout  # noqa: F401
+from app.models.office_map_settings import OfficeMapSettings  # noqa: F401
 
 
 def create_app() -> FastAPI:
@@ -28,6 +30,7 @@ def create_app() -> FastAPI:
     app.include_router(desks.router)
     app.include_router(reservations.router)
     app.include_router(availability.router)
+    app.include_router(office_map_settings.router)
 
     return app
 
