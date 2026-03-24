@@ -1,6 +1,6 @@
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
@@ -43,12 +43,25 @@ def get_availability(
     result: list[AvailabilityDesk] = []
     for d in desks:
         status = "available"
+        booked_by_name = None
+        booked_by_email = None
+        booked_from = None
+        booked_to = None
         res_for_desk = by_desk.get(d.id, [])
         if res_for_desk:
-            if any(r.user_id == current_user.id for r in res_for_desk):
+            mine_res = [r for r in res_for_desk if r.user_id == current_user.id]
+            if mine_res:
                 status = "mine"
+                active_res = sorted(mine_res, key=lambda r: r.start_time)[0]
             else:
                 status = "occupied"
+                active_res = sorted(res_for_desk, key=lambda r: r.start_time)[0]
+
+            booking_user = db.query(User).filter(User.id == active_res.user_id).first()
+            booked_by_name = booking_user.name if booking_user else None
+            booked_by_email = booking_user.email if booking_user else None
+            booked_from = active_res.start_time
+            booked_to = active_res.end_time
 
         result.append(
             AvailabilityDesk(
@@ -59,6 +72,10 @@ def get_availability(
                 room=d.room,
                 rotation_deg=by_desk_id.get(d.id, 0),
                 status=status,
+                booked_by_name=booked_by_name,
+                booked_by_email=booked_by_email,
+                booked_from=booked_from,
+                booked_to=booked_to,
             )
         )
     return result

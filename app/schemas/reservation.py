@@ -35,4 +35,8 @@ class AvailabilityDesk(BaseModel):
     room: str
     rotation_deg: int = 0
     status: str  # available | occupied | mine
+    booked_by_name: str | None = None
+    booked_by_email: str | None = None
+    booked_from: datetime | None = None
+    booked_to: datetime | None = None
 
