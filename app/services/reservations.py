@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time
 
 from fastapi import HTTPException, status
 from sqlalchemy import and_
@@ -35,6 +35,23 @@ def create_reservation(db: Session, *, current_user: User, reservation_in: Reser
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Desk not found")
 
     ensure_no_overlap(db, reservation_in.desk_id, reservation_in.start_time, reservation_in.end_time)
+
+    # Business rule: one desk booking per user per calendar day.
+    day_start = datetime.combine(reservation_in.start_time.date(), time.min)
+    day_end = datetime.combine(reservation_in.start_time.date(), time.max)
+    existing_same_day = (
+        db.query(Reservation)
+        .filter(
+            Reservation.user_id == current_user.id,
+            and_(Reservation.start_time < day_end, Reservation.end_time > day_start),
+        )
+        .first()
+    )
+    if existing_same_day:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You already have a desk booking on this day. Only one desk per day is allowed.",
+        )
 
     reservation = Reservation(
         user_id=current_user.id,

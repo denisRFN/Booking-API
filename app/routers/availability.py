@@ -40,6 +40,15 @@ def get_availability(
     for r in reservations:
         by_desk.setdefault(r.desk_id, []).append(r)
 
+    # Legacy data may contain multiple desks booked by same user in one day.
+    # Keep only one desk as "mine" for the day; show others as "occupied".
+    mine_reservations = [r for r in reservations if r.user_id == current_user.id]
+    primary_mine_reservation = (
+        sorted(mine_reservations, key=lambda r: (r.start_time, r.created_at))[0]
+        if mine_reservations
+        else None
+    )
+
     result: list[AvailabilityDesk] = []
     for d in desks:
         status = "available"
@@ -51,11 +60,15 @@ def get_availability(
         if res_for_desk:
             mine_res = [r for r in res_for_desk if r.user_id == current_user.id]
             if mine_res:
-                status = "mine"
-                active_res = sorted(mine_res, key=lambda r: r.start_time)[0]
+                if primary_mine_reservation and d.id == primary_mine_reservation.desk_id:
+                    status = "mine"
+                    active_res = primary_mine_reservation
+                else:
+                    status = "occupied"
+                    active_res = sorted(mine_res, key=lambda r: (r.start_time, r.created_at))[0]
             else:
                 status = "occupied"
-                active_res = sorted(res_for_desk, key=lambda r: r.start_time)[0]
+                active_res = sorted(res_for_desk, key=lambda r: (r.start_time, r.created_at))[0]
 
             booking_user = db.query(User).filter(User.id == active_res.user_id).first()
             booked_by_name = booking_user.name if booking_user else None
